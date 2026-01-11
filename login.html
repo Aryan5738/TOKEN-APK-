@@ -6,173 +6,93 @@
 <title>Secure Login</title>
 <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
 <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
+    body { height: 100vh; display: flex; justify-content: center; align-items: center; background: transparent; }
     
-    body {
-        height: 100vh;
-        width: 100vw;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background: transparent; /* Zaroori hai */
-        overflow: hidden;
-    }
-
-    /* Glass Effect Card */
     .card {
         width: 320px;
         padding: 30px;
-        background: rgba(0, 0, 0, 0.75); /* Dark Glass */
-        backdrop-filter: blur(15px);
-        -webkit-backdrop-filter: blur(15px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(0, 0, 0, 0.75);
         border-radius: 20px;
+        border: 1px solid rgba(255,255,255,0.1);
         text-align: center;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    }
-
-    h2 { color: #fff; margin-bottom: 5px; font-weight: 600; }
-    p { color: #aaa; font-size: 13px; margin-bottom: 25px; }
-
-    .input-group {
-        position: relative;
-        margin-bottom: 15px;
-        text-align: left;
-    }
-
-    .input-group ion-icon {
-        position: absolute;
-        top: 50%;
-        left: 15px;
-        transform: translateY(-50%);
-        color: #00E676;
+        color: white;
     }
 
     input {
         width: 100%;
-        padding: 12px 15px 12px 40px;
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid #333;
-        border-radius: 10px;
-        color: #fff;
+        padding: 12px;
+        margin-bottom: 15px;
+        background: rgba(255,255,255,0.1);
+        border: 1px solid #444;
+        border-radius: 8px;
+        color: white;
         outline: none;
-        transition: 0.3s;
-    }
-
-    input:focus {
-        border-color: #00E676;
-        background: rgba(255, 255, 255, 0.12);
     }
 
     button {
         width: 100%;
         padding: 12px;
-        background: linear-gradient(90deg, #00E676, #00C853);
-        color: black;
-        font-weight: bold;
+        background: #00E676;
         border: none;
-        border-radius: 10px;
+        border-radius: 8px;
+        font-weight: bold;
         cursor: pointer;
-        margin-top: 10px;
-        font-size: 16px;
-        box-shadow: 0 5px 15px rgba(0, 230, 118, 0.2);
     }
 
-    button:active { transform: scale(0.98); }
-
-    /* TOKEN AREA (Hidden initially) */
-    #tokenSection { display: none; }
-
-    textarea {
-        width: 100%;
-        height: 100px;
-        background: #111;
-        border: 1px solid #444;
-        color: #00E676;
-        padding: 10px;
-        border-radius: 10px;
-        resize: none;
-        font-size: 12px;
-        margin-bottom: 10px;
-    }
-
-    .status {
-        margin-top: 15px;
-        font-size: 12px;
-        color: #FFD700;
-    }
+    #tokenArea { display: none; }
+    textarea { width: 100%; height: 80px; background: #111; color: #0f0; margin-bottom: 10px; }
 </style>
 </head>
 <body>
 
     <div class="card" id="loginForm">
-        <h2 style="color:#00E676;">SYSTEM LOGIN</h2>
-        <p>Enter details to generate token</p>
-
-        <div class="input-group">
-            <ion-icon name="person-outline"></ion-icon>
-            <input type="text" id="email" placeholder="Email / ID">
-        </div>
-
-        <div class="input-group">
-            <ion-icon name="lock-closed-outline"></ion-icon>
-            <input type="password" id="password" placeholder="Password">
-        </div>
-
-        <button onclick="login()">GET TOKEN</button>
-        <div class="status" id="msg"></div>
+        <h2>LOGIN</h2>
+        <input type="text" id="email" placeholder="Email / ID">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="sendToJava()">LOGIN</button>
+        <p id="msg" style="margin-top:10px; font-size:12px; color:yellow;"></p>
     </div>
 
-    <div class="card" id="tokenSection">
-        <div style="font-size: 50px; color: #00E676; margin-bottom: 10px;">
-            <ion-icon name="checkmark-circle"></ion-icon>
-        </div>
-        <h2>SUCCESS!</h2>
-        <p>Token Generated</p>
-        
+    <div class="card" id="tokenArea">
+        <h2 style="color:#00E676;">SUCCESS!</h2>
         <textarea id="tokenBox" readonly></textarea>
-        
         <button onclick="copyToken()">COPY TOKEN</button>
-        <button onclick="location.reload()" style="background: #333; color: white; margin-top: 10px;">LOGOUT</button>
+        <button onclick="location.reload()" style="background:#333; margin-top:5px;">LOGOUT</button>
     </div>
 
     <script>
-        // --- BUTTON CLICK LOGIC ---
-        function login() {
+        function sendToJava() {
             var em = document.getElementById('email').value;
             var ps = document.getElementById('password').value;
             var msg = document.getElementById('msg');
 
             if(!em || !ps) {
-                msg.innerText = "❌ Please enter Email and Password";
+                msg.innerText = "Empty Fields!";
                 return;
             }
 
-            msg.innerText = "🔄 Connecting to Server...";
+            msg.innerText = "Connecting...";
 
-            // JAVA KO CALL KARO
+            // Check if App Interface exists
             if(window.Android) {
-                Android.onLoginClick(em, ps);
+                Android.onLoginClick(em, ps); // JAVA HANDLE KAREGA
             } else {
-                msg.innerText = "⚠️ App Interface Error (Run in App)";
+                msg.innerText = "Error: Run in App Only";
             }
         }
 
-        // --- JAVA SE TOKEN AAYEGA ---
+        // Java yahan Token bhejega
         function onTokenReceived(token) {
             document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('tokenSection').style.display = 'block';
+            document.getElementById('tokenArea').style.display = 'block';
             document.getElementById('tokenBox').value = token;
         }
 
-        // --- COPY FUNCTION ---
         function copyToken() {
             var t = document.getElementById('tokenBox').value;
-            if(window.Android) {
-                Android.copyToClip(t);
-            }
+            if(window.Android) Android.copyToClip(t);
         }
     </script>
-
 </body>
 </html>
