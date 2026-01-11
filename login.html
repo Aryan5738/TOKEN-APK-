@@ -6,74 +6,112 @@
 <title>Login</title>
 <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
 <style>
+  /* Tera Stylish CSS */
   * { box-sizing: border-box; font-family: sans-serif; }
   body { background: transparent; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-  .card { width: 300px; padding: 25px; background: rgba(20,20,20,0.9); border-radius: 20px; border: 1px solid rgba(255,255,255,0.2); text-align: center; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-  h2 { margin-top: 0; }
-  input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #444; background: #222; color: #fff; }
-  button { width: 100%; padding: 14px; background: #00E676; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 10px; transition: 0.2s; }
-  button:active { transform: scale(0.95); opacity: 0.8; }
+  .card { width: 320px; padding: 25px; background: rgba(0,0,0,0.8); border-radius: 20px; border: 1px solid rgba(255,255,255,0.2); text-align: center; color: white; backdrop-filter: blur(10px); }
+  input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #444; background: rgba(255,255,255,0.1); color: #fff; outline:none; }
+  button { width: 100%; padding: 14px; background: #00E676; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 10px; }
+  .loader { border: 3px solid #f3f3f3; border-top: 3px solid #00E676; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; }
+  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
 
-  <div class="card" id="mainCard">
-    <h2>Secure Login</h2>
-    <p style="font-size:12px; color:#aaa;">Enter details to fetch token</p>
+  <div class="card" id="loginForm">
+    <h2>Secure Access</h2>
+    <p style="color:#aaa; font-size:12px;">Login to fetch token</p>
     
     <input type="email" id="email" placeholder="Email / ID">
     <input type="password" id="pass" placeholder="Password">
     
-    <button id="btn" onclick="startLogin()">Get Token</button>
-    
-    <p id="msg" style="font-size:11px; margin-top:15px; color:#yellow;"></p>
+    <button id="btn" onclick="directLogin()">Get Token</button>
+    <p id="msg" style="font-size:12px; margin-top:15px; color:#FFD700;"></p>
+  </div>
+
+  <div class="card" id="tokenArea" style="display:none;">
+    <h2 style="color:#00E676;">SUCCESS!</h2>
+    <textarea id="tokenBox" rows="5" style="width:100%; background:#111; color:#0f0; border:1px solid #333; padding:10px;"></textarea>
+    <button onclick="copyToken()">Copy Token</button>
   </div>
 
   <script>
-    function startLogin() {
-      // 1. Button Dabate hi UI Change hoga (Proof ki click hua)
-      var btn = document.getElementById('btn');
-      var msg = document.getElementById('msg');
-      var em = document.getElementById('email').value;
-      var ps = document.getElementById('pass').value;
+    let API_URL = "http://127.0.0.1:5000"; // Java se set hoga
 
-      btn.innerText = "Processing...";
-      btn.style.background = "#FFC107"; // Yellow color
-      msg.innerText = "Click Registered. Calling App...";
-
-      // Validation
-      if(!em || !ps) {
-        alert("⚠️ Please enter Email and Password!");
-        btn.innerText = "Get Token";
-        btn.style.background = "#00E676";
-        msg.innerText = "";
-        return;
-      }
-
-      // 2. Delay dekar Java ko call karte hain (Taaki UI update ho sake)
-      setTimeout(function() {
-        if(window.Android) {
-          // Success Case
-          msg.innerText = "Sending Data to Server...";
-          Android.onLoginClick(em, ps);
-        } else {
-          // Failure Case
-          alert("❌ ERROR: App se connection nahi hua!\nCode check karo 'addJavascriptInterface' wala.");
-          msg.innerText = "Bridge Broken.";
-          btn.innerText = "Retry";
-          btn.style.background = "#FF5252";
-        }
-      }, 500);
+    // 1. Java ye function call karega URL set karne ke liye
+    function setApiConfig(url) {
+        API_URL = url;
+        // Agar URL me '/' last me hai to hata do
+        if(API_URL.endsWith('/')) API_URL = API_URL.slice(0, -1);
     }
 
-    // Token Milne par yeh chalega
-    function onTokenReceived(token) {
-      document.getElementById('mainCard').innerHTML = `
-        <h2 style="color:#00E676;">SUCCESS!</h2>
-        <p>Token Generated</p>
-        <textarea style="width:100%; background:#111; color:#0f0; border:1px solid #333; height:80px;">${token}</textarea>
-        <button onclick="Android.copyToClip('${token}')">Copy Token</button>
-      `;
+    // 2. Direct JavaScript Login (No Java Bridge Needed for Network)
+    async function directLogin() {
+        var em = document.getElementById('email').value;
+        var ps = document.getElementById('pass').value;
+        var btn = document.getElementById('btn');
+        var msg = document.getElementById('msg');
+
+        if(!em || !ps) { alert("Fill details"); return; }
+        if(!API_URL) { alert("API URL not loaded yet!"); return; }
+
+        // UI Update
+        btn.innerHTML = "<div class='loader'></div> Processing...";
+        msg.innerText = "Connecting to Server...";
+
+        try {
+            // Seedha API Call (Browser se)
+            const response = await fetch(API_URL + "/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: em, password: ps })
+            });
+
+            const data = await response.json();
+
+            if (data.status === "success") {
+                showToken(data.token);
+            } else if (data.status === "2fa_required") {
+                // 2FA Logic (Simple Prompt)
+                let code = prompt("Enter 2FA Code:");
+                if(code) submit2FA(em, ps, code, data.data);
+            } else {
+                msg.innerText = "Error: " + data.message;
+                btn.innerHTML = "Try Again";
+            }
+
+        } catch (error) {
+            msg.innerText = "Connection Failed!";
+            alert("Error: " + error.message);
+            btn.innerHTML = "Get Token";
+        }
+    }
+
+    async function submit2FA(email, password, code, twoFaData) {
+        try {
+            const response = await fetch(API_URL + "/submit_2fa", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: email, password: password, code: code, two_fa_data: twoFaData })
+            });
+            const data = await response.json();
+            if (data.status === "success") showToken(data.token);
+            else alert(data.message);
+        } catch (e) { alert("2FA Failed"); }
+    }
+
+    function showToken(token) {
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('tokenArea').style.display = 'block';
+        document.getElementById('tokenBox').value = token;
+    }
+
+    function copyToken() {
+        var t = document.getElementById('tokenBox');
+        t.select();
+        document.execCommand('copy');
+        // Java ko bas Copy karne ke liye bulao
+        if(window.Android) Android.copyToClip(t.value);
     }
   </script>
 
