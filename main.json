@@ -1,8 +1,8 @@
 {
   "config": {
     "app_status": "active",
-    "maintenance_msg": "Server par update chal raha hai. Kripya 1 ghante baad try karein.",
-    "whatsapp_group": "https://chat.whatsapp.com/Tera_Group_Link_Yahan",
+    "maintenance_msg": "App mast chal raha hai.",
+    "whatsapp_group": "https://chat.whatsapp.com/Tera_Group_Link",
     "bg_image": "https://i.ibb.co/27frchKY/20e6e3b849b3aab7b92b1b7b3c5e6710.jpg"
   },
   "keys": {
