@@ -3,117 +3,174 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login</title>
+<title>Secure Login</title>
 <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
 <style>
-  /* Tera Stylish CSS */
-  * { box-sizing: border-box; font-family: sans-serif; }
-  body { background: transparent; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-  .card { width: 320px; padding: 25px; background: rgba(0,0,0,0.8); border-radius: 20px; border: 1px solid rgba(255,255,255,0.2); text-align: center; color: white; backdrop-filter: blur(10px); }
-  input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #444; background: rgba(255,255,255,0.1); color: #fff; outline:none; }
-  button { width: 100%; padding: 14px; background: #00E676; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 10px; }
-  .loader { border: 3px solid #f3f3f3; border-top: 3px solid #00E676; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; }
-  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+    
+    body {
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: transparent; /* Zaroori hai taaki App ka BG dikhe */
+        color: white;
+    }
+
+    /* Glass Card */
+    .card {
+        width: 320px;
+        padding: 30px;
+        background: rgba(0, 0, 0, 0.65);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+        text-align: center;
+        transition: 0.3s;
+    }
+
+    h2 { margin-bottom: 5px; font-weight: 600; letter-spacing: 1px; }
+    p { color: #aaa; font-size: 13px; margin-bottom: 25px; }
+
+    .input-box {
+        position: relative;
+        margin-bottom: 15px;
+    }
+
+    .input-box ion-icon {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #00C853;
+    }
+
+    input {
+        width: 100%;
+        padding: 12px 15px 12px 40px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        color: #fff;
+        outline: none;
+        font-size: 14px;
+        transition: 0.3s;
+    }
+
+    input:focus {
+        border-color: #00C853;
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .btn {
+        width: 100%;
+        padding: 12px;
+        margin-top: 10px;
+        background: linear-gradient(45deg, #00C853, #009624);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 5px 15px rgba(0, 200, 83, 0.3);
+        transition: 0.2s;
+    }
+
+    .btn:active { transform: scale(0.95); }
+
+    /* Hidden Token Area */
+    #tokenArea { display: none; }
+    
+    textarea {
+        width: 100%;
+        height: 100px;
+        background: #111;
+        border: 1px solid #333;
+        color: #00C853;
+        border-radius: 8px;
+        padding: 10px;
+        font-size: 12px;
+        resize: none;
+        margin-bottom: 15px;
+    }
+
+    .status { font-size: 11px; margin-top: 15px; color: #ffeb3b; }
+
 </style>
 </head>
 <body>
 
-  <div class="card" id="loginForm">
-    <h2>Secure Access</h2>
-    <p style="color:#aaa; font-size:12px;">Login to fetch token</p>
-    
-    <input type="email" id="email" placeholder="Email / ID">
-    <input type="password" id="pass" placeholder="Password">
-    
-    <button id="btn" onclick="directLogin()">Get Token</button>
-    <p id="msg" style="font-size:12px; margin-top:15px; color:#FFD700;"></p>
-  </div>
+    <div class="card" id="loginScreen">
+        <h2 style="color: #00C853;">SYSTEM ACCESS</h2>
+        <p>Enter credentials to connect</p>
 
-  <div class="card" id="tokenArea" style="display:none;">
-    <h2 style="color:#00E676;">SUCCESS!</h2>
-    <textarea id="tokenBox" rows="5" style="width:100%; background:#111; color:#0f0; border:1px solid #333; padding:10px;"></textarea>
-    <button onclick="copyToken()">Copy Token</button>
-  </div>
+        <div class="input-box">
+            <ion-icon name="mail-outline"></ion-icon>
+            <input type="email" id="email" placeholder="Email / ID">
+        </div>
 
-  <script>
-    let API_URL = "http://127.0.0.1:5000"; // Java se set hoga
+        <div class="input-box">
+            <ion-icon name="lock-closed-outline"></ion-icon>
+            <input type="password" id="password" placeholder="Password">
+        </div>
 
-    // 1. Java ye function call karega URL set karne ke liye
-    function setApiConfig(url) {
-        API_URL = url;
-        // Agar URL me '/' last me hai to hata do
-        if(API_URL.endsWith('/')) API_URL = API_URL.slice(0, -1);
-    }
+        <button class="btn" onclick="startLogin()">CONNECT</button>
+        <div class="status" id="statusMsg"></div>
+    </div>
 
-    // 2. Direct JavaScript Login (No Java Bridge Needed for Network)
-    async function directLogin() {
-        var em = document.getElementById('email').value;
-        var ps = document.getElementById('pass').value;
-        var btn = document.getElementById('btn');
-        var msg = document.getElementById('msg');
+    <div class="card" id="tokenArea">
+        <div style="font-size: 40px; color: #00C853; margin-bottom: 10px;">
+            <ion-icon name="checkmark-circle"></ion-icon>
+        </div>
+        <h2>SUCCESS!</h2>
+        <p>Token Generated Successfully</p>
+        
+        <textarea id="tokenBox" readonly></textarea>
+        
+        <button class="btn" onclick="copyToken()">COPY TOKEN</button>
+        <button class="btn" style="background: #333; box-shadow:none; margin-top: 5px;" onclick="location.reload()">LOGOUT</button>
+    </div>
 
-        if(!em || !ps) { alert("Fill details"); return; }
-        if(!API_URL) { alert("API URL not loaded yet!"); return; }
+    <script>
+        // 1. Button Click par Java ko Signal Bhejo
+        function startLogin() {
+            var em = document.getElementById('email').value;
+            var ps = document.getElementById('password').value;
+            var status = document.getElementById('statusMsg');
 
-        // UI Update
-        btn.innerHTML = "<div class='loader'></div> Processing...";
-        msg.innerText = "Connecting to Server...";
-
-        try {
-            // Seedha API Call (Browser se)
-            const response = await fetch(API_URL + "/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email: em, password: ps })
-            });
-
-            const data = await response.json();
-
-            if (data.status === "success") {
-                showToken(data.token);
-            } else if (data.status === "2fa_required") {
-                // 2FA Logic (Simple Prompt)
-                let code = prompt("Enter 2FA Code:");
-                if(code) submit2FA(em, ps, code, data.data);
-            } else {
-                msg.innerText = "Error: " + data.message;
-                btn.innerHTML = "Try Again";
+            if (!em || !ps) {
+                status.innerText = "❌ Please enter Email & Password";
+                return;
             }
 
-        } catch (error) {
-            msg.innerText = "Connection Failed!";
-            alert("Error: " + error.message);
-            btn.innerHTML = "Get Token";
+            status.innerText = "🔄 Connecting to Server...";
+            
+            // Java Interface Call
+            if (window.Android) {
+                Android.onLoginClick(em, ps);
+            } else {
+                status.innerText = "⚠️ App Interface Not Found!";
+            }
         }
-    }
 
-    async function submit2FA(email, password, code, twoFaData) {
-        try {
-            const response = await fetch(API_URL + "/submit_2fa", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email: email, password: password, code: code, two_fa_data: twoFaData })
-            });
-            const data = await response.json();
-            if (data.status === "success") showToken(data.token);
-            else alert(data.message);
-        } catch (e) { alert("2FA Failed"); }
-    }
+        // 2. Jab Java Token bhejega toh yeh chalega
+        function onTokenReceived(token) {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('tokenArea').style.display = 'block';
+            document.getElementById('tokenBox').value = token;
+        }
 
-    function showToken(token) {
-        document.getElementById('loginForm').style.display = 'none';
-        document.getElementById('tokenArea').style.display = 'block';
-        document.getElementById('tokenBox').value = token;
-    }
-
-    function copyToken() {
-        var t = document.getElementById('tokenBox');
-        t.select();
-        document.execCommand('copy');
-        // Java ko bas Copy karne ke liye bulao
-        if(window.Android) Android.copyToClip(t.value);
-    }
-  </script>
+        // 3. Token Copy Logic
+        function copyToken() {
+            var t = document.getElementById('tokenBox').value;
+            if (window.Android) {
+                Android.copyToClip(t);
+            }
+        }
+    </script>
 
 </body>
 </html>
