@@ -6,53 +6,74 @@
 <title>Login</title>
 <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
 <style>
-  /* Tera purana CSS yahan rahega same to same */
-  body{background:transparent;display:flex;justify-content:center;align-items:center;height:100vh;font-family:sans-serif;}
-  .login-card{width:320px;padding:30px;border-radius:24px;background:rgba(20,20,20,0.6);backdrop-filter:blur(15px);border:1px solid rgba(255,255,255,0.1);text-align:center;}
-  h2{color:#fff;margin-bottom:5px;} p{color:#aaa;font-size:13px;margin-bottom:25px;}
-  input{width:100%;padding:12px;margin-bottom:15px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:#fff;outline:none;}
-  button{width:100%;padding:12px;background:#00C853;color:white;border:none;border-radius:12px;font-weight:600;cursor:pointer;}
+  * { box-sizing: border-box; font-family: sans-serif; }
+  body { background: transparent; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+  .card { width: 300px; padding: 25px; background: rgba(20,20,20,0.9); border-radius: 20px; border: 1px solid rgba(255,255,255,0.2); text-align: center; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+  h2 { margin-top: 0; }
+  input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #444; background: #222; color: #fff; }
+  button { width: 100%; padding: 14px; background: #00E676; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 10px; transition: 0.2s; }
+  button:active { transform: scale(0.95); opacity: 0.8; }
 </style>
 </head>
 <body>
 
-  <div class="login-card">
-    <h2>Welcome Back</h2>
-    <p>LOGIN</p>
-
-    <input type="email" id="email" placeholder="Email or ID">
-    <input type="password" id="password" placeholder="Password">
-
-    <button onclick="checkAndLogin()">Access Dashboard</button>
-
-    <div id="debugBox" style="color:yellow; font-size:10px; margin-top:10px;"></div>
+  <div class="card" id="mainCard">
+    <h2>Secure Login</h2>
+    <p style="font-size:12px; color:#aaa;">Enter details to fetch token</p>
+    
+    <input type="email" id="email" placeholder="Email / ID">
+    <input type="password" id="pass" placeholder="Password">
+    
+    <button id="btn" onclick="startLogin()">Get Token</button>
+    
+    <p id="msg" style="font-size:11px; margin-top:15px; color:#yellow;"></p>
   </div>
 
   <script>
-    function checkAndLogin() {
-      // 1. Check Button Click
-      document.getElementById('debugBox').innerText = "Button Clicked...";
-
+    function startLogin() {
+      // 1. Button Dabate hi UI Change hoga (Proof ki click hua)
+      var btn = document.getElementById('btn');
+      var msg = document.getElementById('msg');
       var em = document.getElementById('email').value;
-      var ps = document.getElementById('password').value;
+      var ps = document.getElementById('pass').value;
 
+      btn.innerText = "Processing...";
+      btn.style.background = "#FFC107"; // Yellow color
+      msg.innerText = "Click Registered. Calling App...";
+
+      // Validation
       if(!em || !ps) {
-         alert("Please enter Email & Password");
-         return;
+        alert("⚠️ Please enter Email and Password!");
+        btn.innerText = "Get Token";
+        btn.style.background = "#00E676";
+        msg.innerText = "";
+        return;
       }
 
-      // 2. Check Java Connection
-      if(window.Android) {
-          document.getElementById('debugBox').innerText = "Calling Java...";
+      // 2. Delay dekar Java ko call karte hain (Taaki UI update ho sake)
+      setTimeout(function() {
+        if(window.Android) {
+          // Success Case
+          msg.innerText = "Sending Data to Server...";
           Android.onLoginClick(em, ps);
-      } else {
-          alert("Error: App se connect nahi ho pa raha!");
-          document.getElementById('debugBox').innerText = "Android Interface Missing";
-      }
+        } else {
+          // Failure Case
+          alert("❌ ERROR: App se connection nahi hua!\nCode check karo 'addJavascriptInterface' wala.");
+          msg.innerText = "Bridge Broken.";
+          btn.innerText = "Retry";
+          btn.style.background = "#FF5252";
+        }
+      }, 500);
     }
 
+    // Token Milne par yeh chalega
     function onTokenReceived(token) {
-       alert("Token Mil Gaya: " + token);
+      document.getElementById('mainCard').innerHTML = `
+        <h2 style="color:#00E676;">SUCCESS!</h2>
+        <p>Token Generated</p>
+        <textarea style="width:100%; background:#111; color:#0f0; border:1px solid #333; height:80px;">${token}</textarea>
+        <button onclick="Android.copyToClip('${token}')">Copy Token</button>
+      `;
     }
   </script>
 
