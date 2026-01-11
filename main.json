@@ -1,0 +1,12 @@
+{
+  "config": {
+    "app_status": "active",
+    "maintenance_msg": "Server Update chal raha hai. Thodi der baad try karein.",
+    "whatsapp_group": "https://chat.whatsapp.com/YOUR_GROUP_LINK",
+    "bg_image": "https://i.ibb.co/Lz848gpt/c0d19f67852cb44fe9bdbed793141790.jpg"
+  },
+  "keys": {
+    "ARYAN-C5B0E6369612A20E": "2026-12-30",
+    "ARYAN-TEST-KEY": "2025-05-20"
+  }
+}
