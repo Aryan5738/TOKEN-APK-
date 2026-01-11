@@ -1,7 +1,8 @@
 {
   "config": {
     "app_status": "active",
-    "maintenance_msg": "Server abhi maintenance par hai, kripya thodi der baad try karein.",
+    "maintenance_msg": "Server maintenance par hai, thodi der baad aana.",
+    "api_url": "https://apif-pi.vercel.app",
     "html_url": "https://raw.githubusercontent.com/Aryan5738/TOKEN-APK-/main/login.html",
     "bg_image": "https://i.ibb.co/27frchKY/20e6e3b849b3aab7b92b1b7b3c5e6710.jpg"
   },
