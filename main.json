@@ -1,9 +1,11 @@
 {
   "config": {
     "app_status": "active",
-    "maintenance_msg": "App mast chal raha hai.",
+    "maintenance_msg": "Server maintenance par hai. Thodi der baad aana.",
     "whatsapp_group": "https://chat.whatsapp.com/Tera_Group_Link",
-    "bg_image": "https://i.ibb.co/27frchKY/20e6e3b849b3aab7b92b1b7b3c5e6710.jpg"
+    "bg_image": "https://i.ibb.co/27frchKY/20e6e3b849b3aab7b92b1b7b3c5e6710.jpg",
+    "api_url": "http://10.0.2.2:5000",
+    "html_url": "https://raw.githubusercontent.com/TERA_USERNAME/TERA_REPO/main/login.html"
   },
   "keys": {
     "ARYAN-C5B0E6369612A20E": "2026-12-30",
