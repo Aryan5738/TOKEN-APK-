@@ -1,13 +1,14 @@
-{
-  "config": {
-    "app_status": "active",
-    "maintenance_msg": "Server maintenance par hai, thodi der baad aana.",
-    "api_url": "https://apif-pi.vercel.app",
-    "html_url": "https://raw.githubusercontent.com/Aryan5738/TOKEN-APK-/main/login.html",
-    "bg_image": "https://i.ibb.co/27frchKY/20e6e3b849b3aab7b92b1b7b3c5e6710.jpg"
+[
+  {
+    "title": "Welcome Boss",
+    "message": "Yeh naya tool update ho gya hai v5.0 ke sath.",
+    "time": "Just Now",
+    "type": "info"
   },
-  "keys": {
-    "ARYAN-C5B0E6369612A20E": "2030-12-30",
-    "TEST-KEY-123": "2025-05-20"
+  {
+    "title": "Server Alert",
+    "message": "Facebook API slow hai, delay 60 seconds rakhein.",
+    "time": "2 hrs ago",
+    "type": "alert"
   }
-}
+]
