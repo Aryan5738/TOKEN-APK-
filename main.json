@@ -3,6 +3,6 @@
     "title": "CRITICAL WARNING ⚠️",
     "message": "This tool is crash. Server is down due to overload.",
     "time": "Just Now",
-    "type": "alert"
+    "type": "warning"
   }
 ]
