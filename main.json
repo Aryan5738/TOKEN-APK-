@@ -1,14 +1,8 @@
 [
   {
-    "title": "Welcome Boss",
-    "message": "Yeh naya tool update ho gya hai v5.0 ke sath.",
+    "title": "CRITICAL WARNING ⚠️",
+    "message": "This tool is crash. Server is down due to overload.",
     "time": "Just Now",
-    "type": "info"
-  },
-  {
-    "title": "Server Alert",
-    "message": "Facebook API slow hai, delay 60 seconds rakhein.",
-    "time": "2 hrs ago",
     "type": "alert"
   }
 ]
